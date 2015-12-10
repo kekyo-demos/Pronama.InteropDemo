@@ -59,7 +59,7 @@
     <Compile Include="Command.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Property.cs" />
-    <Compile Include="Win32Interops.cs" />
+    <Compile Include="Utilities.cs" />
     <Page Include="KureiKeiWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
