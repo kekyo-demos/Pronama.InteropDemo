@@ -78,6 +78,14 @@ namespace Pronama.InteropDemo.StateMachines
 
 			// 着地しなかった
 			base.CurrentPoint = nextPoint;
+
+			// 見えないところまで来た
+			if (base.CurrentPoint.X < -64)
+			{
+				// 最初の地点に戻す
+				return KureiKeiStateMachine.Start();
+			}
+
 			return this;
 		}
 	}

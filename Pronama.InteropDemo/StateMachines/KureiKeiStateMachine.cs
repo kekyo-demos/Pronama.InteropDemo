@@ -27,6 +27,7 @@
 
 using System.Windows;
 using System.Windows.Media;
+using Pronama.InteropDemo.Internals;
 
 namespace Pronama.InteropDemo.StateMachines
 {
@@ -54,5 +55,16 @@ namespace Pronama.InteropDemo.StateMachines
 		/// </summary>
 		/// <returns>次のステートマシン</returns>
 		public abstract KureiKeiStateMachine Next();
+
+		/// <summary>
+		/// 最初のステートマシンを取得します。
+		/// </summary>
+		/// <returns>ステートマシン</returns>
+		public static KureiKeiStateMachine Start()
+		{
+			// 最初の地点
+			var topRight = NativeMethods.GetDesktopRectangle().TopRight;
+			return new KureiKeiFallStateMachine(new Point(topRight.X - 50, topRight.Y + 50));
+		}
 	}
 }

@@ -53,9 +53,8 @@ namespace Pronama.InteropDemo
 		/// </summary>
 		public KureiKeiViewModel()
 		{
-			// 初期状態を落下にします。
-			var topRight = NativeMethods.GetDesktopRectangle().TopRight;
-			stateMachine_ = new KureiKeiFallStateMachine(new Point(topRight.X - 100, topRight.Y + 100));
+			// 初期状態を保存する
+			stateMachine_ = KureiKeiStateMachine.Start();
 			this.Update();
 
 			// タイマーを初期化します（まだ開始しない）

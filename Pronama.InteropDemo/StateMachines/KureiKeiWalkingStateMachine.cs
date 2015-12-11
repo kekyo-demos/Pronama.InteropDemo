@@ -84,8 +84,17 @@ namespace Pronama.InteropDemo.StateMachines
 			// 矩形の左端まで来た
 			if (base.CurrentPoint.X < landingInformation_.BoxRect.X)
 			{
-				// 左端まで来たら、落下ステートに変更する
-				return new KureiKeiFallStateMachine(base.CurrentPoint);
+				// 見えないところまで来た
+				if (base.CurrentPoint.X < -64)
+				{
+					// 最初の地点に戻す
+					return KureiKeiStateMachine.Start();
+				}
+				else
+				{
+					// 左端まで来たら、落下ステートに変更する
+					return new KureiKeiFallStateMachine(base.CurrentPoint);
+				}
 			}
 
 			// 今のステートを繰り返す
