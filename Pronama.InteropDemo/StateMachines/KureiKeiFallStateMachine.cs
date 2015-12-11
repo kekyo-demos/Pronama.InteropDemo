@@ -25,66 +25,60 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using System.ComponentModel;
+using System.Windows;
+using System.Windows.Media;
+using Pronama.InteropDemo.Internals;
 
-namespace Pronama.InteropDemo
+namespace Pronama.InteropDemo.StateMachines
 {
 	/// <summary>
-	/// XAMLデータバインディングで、ビューモデルのプロパティをバインディング可能にする、簡易的なヘルパークラスです。
+	/// 落下中を示すステートマシンです。
 	/// </summary>
-	/// <typeparam name="TValue">バインディング対象の値の型</typeparam>
-	/// <remarks>
-	/// このクラスを使うと、XAMLデータバインディング（ビューモデルからビューに値を自動的に転送する）が実現します。
-	/// このクラスは簡易的な実装です。本格的にはPrism・MVVMLight・ReactiveProperty等を使用してください。
-	/// </remarks>
-	public sealed class Property<TValue> : INotifyPropertyChanged
+	public sealed class KureiKeiFallStateMachine : KureiKeiStateMachine
 	{
+		private static ImageSource fallImage_;
+		private int accelleration_ = 1;
+
 		/// <summary>
 		/// コンストラクタです。
 		/// </summary>
-		public Property()
+		/// <param name="startPoint">落下開始位置</param>
+		public KureiKeiFallStateMachine(Point startPoint)
 		{
+			if (fallImage_ == null)
+			{
+				// 落ちているイメージをロードします
+				fallImage_ = Utilities.LoadImage("pack://application:,,,/Images/06-A.png");
+			}
+
+			base.CurrentPoint = startPoint;
+			base.CurrentImage = fallImage_;
 		}
 
 		/// <summary>
-		/// ビューに転送する値です。
+		/// 次のステートを計算し、ステートマシンを取得します。
 		/// </summary>
-		/// <remarks>
-		/// このプロパティはXAMLからバインディング式によって参照されます。
-		/// </remarks>
-		public TValue Value { get; private set; }
-
-		/// <summary>
-		/// プロパティが変更されたことを示すイベントです。
-		/// </summary>
-		/// <remarks>
-		/// このイベントはWPFが使用します。
-		/// </remarks>
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		/// <summary>
-		/// 新しい値を設定します。
-		/// </summary>
-		/// <param name="value">値</param>
-		/// <remarks>値を設定すると、値が更新されたことがWPFに通知され、ビューの表示が更新されます。</remarks>
-		public void SetValue(TValue value)
+		/// <returns>次のステートマシン</returns>
+		public override KureiKeiStateMachine Next()
 		{
-			if ((Value == null) && (value == null))
+			// 今回の落下位置
+			var nextPoint = new Point(base.CurrentPoint.X - 24, base.CurrentPoint.Y + 4 * accelleration_);
+			accelleration_++;
+
+			// デスクトップ上の全ての可視ウインドウを取得
+			var boxes = Utilities.GetValidWindowRects();
+
+			// 着地点を計算
+			var landingInformation = Utilities.ComputeLanding(boxes, base.CurrentPoint, nextPoint);
+			if (landingInformation != null)
 			{
-				return;
+				// 歩行ステートに変更する
+				return new KureiKeiWalkingStateMachine(landingInformation);
 			}
 
-			if ((Value != null) && (value != null))
-			{
-				if (Value.Equals(value))
-				{
-					return;
-				}
-			}
-
-			Value = value;
-
-			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+			// 着地しなかった
+			base.CurrentPoint = nextPoint;
+			return this;
 		}
 	}
 }

@@ -26,10 +26,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Linq;
+using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Pronama.InteropDemo.Internals;
+using Pronama.InteropDemo.StateMachines;
+using Pronama.InteropDemo.UI;
 
 namespace Pronama.InteropDemo
 {
@@ -43,30 +45,22 @@ namespace Pronama.InteropDemo
 	/// </remarks>
 	public sealed class KureiKeiViewModel
 	{
-		private readonly ImageSource[] walkingImages_;
-		private readonly ImageSource fallImage_;
 		private readonly DispatcherTimer timer_;
-		private int walkingImageIndex_ = 0;
+		private KureiKeiStateMachine stateMachine_;
 
 		/// <summary>
 		/// コンストラクタです。
 		/// </summary>
 		public KureiKeiViewModel()
 		{
-			// 歩いているイメージ群をロードします
-			walkingImages_ = Enumerable.Range(1, 6).
-				Select(index => new BitmapImage(new Uri(string.Format("/Pronama.InteropDemo;component/Images/01-{0}.png", index), UriKind.Relative))).
-				ToArray();
-
-			// 落ちているイメージをロードします
-			fallImage_ = new BitmapImage(new Uri("/Pronama.InteropDemo;component/Images/06-A.png", UriKind.Relative));
-
-			// 歩いているイメージの最初を設定しておきます
-			this.CurrentImage.SetValue(walkingImages_[walkingImageIndex_++]);
+			// 初期状態を落下にします。
+			var topRight = NativeMethods.GetDesktopRectangle().TopRight;
+			stateMachine_ = new KureiKeiFallStateMachine(new Point(topRight.X - 100, topRight.Y + 100));
+			this.Update();
 
 			// タイマーを初期化します（まだ開始しない）
 			timer_ = new DispatcherTimer(
-				TimeSpan.FromMilliseconds(300),
+				TimeSpan.FromMilliseconds(150),
 				DispatcherPriority.Normal,
 				this.OnInterval,
 				Dispatcher.CurrentDispatcher);
@@ -79,21 +73,6 @@ namespace Pronama.InteropDemo
 		}
 
 		/// <summary>
-		/// 現在のX座標です。
-		/// </summary>
-		public Property<double> CurrentX { get; } = new Property<double>();
-
-		/// <summary>
-		/// 現在のY座標です。
-		/// </summary>
-		public Property<double> CurrentY { get; } = new Property<double>();
-
-		/// <summary>
-		/// 現在のイメージです。
-		/// </summary>
-		public Property<ImageSource> CurrentImage { get; } = new Property<ImageSource>();
-
-		/// <summary>
 		/// Loadedイベントを受け取るコマンドです。
 		/// </summary>
 		public Command Loaded { get; private set; }
@@ -104,17 +83,44 @@ namespace Pronama.InteropDemo
 		public Command Closed { get; private set; }
 
 		/// <summary>
+		/// 現在の座標です。
+		/// </summary>
+		public Property<Rect> CurrentBound { get; } = new Property<Rect>();
+
+		/// <summary>
+		/// 現在のイメージです。
+		/// </summary>
+		public Property<ImageSource> CurrentImage { get; } = new Property<ImageSource>();
+
+		/// <summary>
+		/// 座標とイメージを更新します。
+		/// </summary>
+		private void Update()
+		{
+			// イメージを2倍サイズにする
+			var imageSize = new Size(
+				stateMachine_.CurrentImage.Width * 2,
+				stateMachine_.CurrentImage.Height * 2);
+
+			// ステートマシンの位置は足元で計算しているので、頭上に変更する
+			var adjustPoint = new Point(
+				stateMachine_.CurrentPoint.X,
+				stateMachine_.CurrentPoint.Y - imageSize.Height);
+
+			this.CurrentBound.SetValue(new Rect(adjustPoint, imageSize));
+			this.CurrentImage.SetValue(stateMachine_.CurrentImage);
+		}
+
+		/// <summary>
 		/// タイマーのインターバル時間が経過したときに呼び出されるハンドラです。
 		/// </summary>
 		/// <param name="sender">送信元（タイマー）</param>
 		/// <param name="e">イベント情報（ダミー）</param>
 		private void OnInterval(object sender, EventArgs e)
 		{
-			// 歩いているイメージを次のものに差し替える
-			this.CurrentImage.SetValue(walkingImages_[walkingImageIndex_++]);
-
-			// 0 --> 1 --> 2 --> 3 --> 4 --> 5 を繰り返す
-			walkingImageIndex_ = walkingImageIndex_ % walkingImages_.Length;
+			// 次のステートに変更する
+			stateMachine_ = stateMachine_.Next();
+			this.Update();
 		}
 	}
 }

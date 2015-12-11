@@ -28,7 +28,7 @@
 using System;
 using System.Windows.Input;
 
-namespace Pronama.InteropDemo
+namespace Pronama.InteropDemo.UI
 {
 	/// <summary>
 	/// XAMLデータバインディングで、ビューのイベントによる通知をビューモデルに通知することが出来る、簡易的なヘルパークラスです。

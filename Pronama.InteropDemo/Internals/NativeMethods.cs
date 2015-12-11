@@ -30,7 +30,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows;
 
-namespace Pronama.InteropDemo
+namespace Pronama.InteropDemo.Internals
 {
 	/// <summary>
 	/// Win32 APIへのアクセスをカプセル化したクラスです。
@@ -77,15 +77,6 @@ namespace Pronama.InteropDemo
 		private static extern bool IsWindowVisible(IntPtr hWnd);
 
 		/// <summary>
-		/// GetWindowRect APIを示す定義です。
-		/// </summary>
-		/// <param name="hwnd">ウインドウハンドル</param>
-		/// <param name="lpRect">ウインドウの位置とサイズを示すRECT構造体（outパラメータなので、APIにはポインタとして渡される）</param>
-		/// <returns>成功すればtrue</returns>
-		[DllImport("user32.dll", SetLastError = true)]
-		private static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
-
-		/// <summary>
 		/// 現在デスクトップ領域に存在する、すべてのウインドウハンドルを全て列挙します。
 		/// </summary>
 		/// <returns>ウインドウハンドル群</returns>
@@ -116,6 +107,28 @@ namespace Pronama.InteropDemo
 			return IsWindowVisible(window);
 		}
 
+		private static Rect ToRect(this RECT rect)
+		{
+			// サイズが0のウインドウはEmptyとして返す
+			if ((rect.Left == 0) && (rect.Right == 0) && (rect.Top == 0) && (rect.Bottom == 0))
+			{
+				return Rect.Empty;
+			}
+
+			// サイズを計算して返す
+			return new Rect(rect.Left, rect.Top, rect.Right - rect.Left + 1, rect.Bottom - rect.Top + 1);
+		}
+
+		#region GetWindowRectangle
+		/// <summary>
+		/// GetWindowRect APIを示す定義です。
+		/// </summary>
+		/// <param name="hwnd">ウインドウハンドル</param>
+		/// <param name="lpRect">ウインドウの位置とサイズを示すRECT構造体（outパラメータなので、APIにはポインタとして渡される）</param>
+		/// <returns>成功すればtrue</returns>
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
+
 		/// <summary>
 		/// 指定されたウインドウハンドルのウインドウの位置とサイズを取得します。
 		/// </summary>
@@ -132,15 +145,107 @@ namespace Pronama.InteropDemo
 			}
 
 			// RECT構造体のままでも使えなくはないが扱いづらいので、WPFのRectクラスに入れ替えて返す
+			return rect.ToRect();
+		}
+		#endregion
 
-			// サイズが0のウインドウはEmptyとして返す
-			if ((rect.Left == 0) && (rect.Right == 0) && (rect.Top == 0) && (rect.Bottom == 0))
+		#region SetWindowRectangle
+		private static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+		private static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
+		private static readonly IntPtr HWND_TOP = new IntPtr(0);
+		private static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
+
+		/// <summary>
+		/// SetWindowPos Flags
+		/// </summary>
+		private enum SetWindowPosFlags
+		{
+			NOSIZE = 0x0001,
+			NOMOVE = 0x0002,
+			NOZORDER = 0x0004,
+			NOREDRAW = 0x0008,
+			NOACTIVATE = 0x0010,
+			DRAWFRAME = 0x0020,
+			FRAMECHANGED = 0x0020,
+			SHOWWINDOW = 0x0040,
+			HIDEWINDOW = 0x0080,
+			NOCOPYBITS = 0x0100,
+			NOOWNERZORDER = 0x0200,
+			NOREPOSITION = 0x0200,
+			NOSENDCHANGING = 0x0400,
+			DEFERERASE = 0x2000,
+			ASYNCWINDOWPOS = 0x4000
+		}
+
+		/// <summary>
+		/// SetWindowPos APIを示す定義です。
+		/// </summary>
+		/// <param name="hWnd">ウインドウハンドル</param>
+		/// <param name="hWndInsertAfter">挿入目標位置を示すウインドウハンドル又は特殊なフラグ</param>
+		/// <param name="X">X座標</param>
+		/// <param name="Y">Y座標</param>
+		/// <param name="cx">幅</param>
+		/// <param name="cy">高さ</param>
+		/// <param name="uFlags">オプションフラグ</param>
+		/// <returns>成功すればtrue</returns>
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern bool SetWindowPos(
+			IntPtr hWnd, IntPtr hWndInsertAfter,
+			int X, int Y, int cx, int cy,
+			SetWindowPosFlags uFlags);
+
+		/// <summary>
+		/// 指定されたウインドウハンドルのウインドウの位置とサイズを設定します。
+		/// </summary>
+		/// <param name="window">ウインドウハンドル</param>
+		/// <param name="rect">矩形</param>
+		public static void SetWindowRectangle(IntPtr window, Rect rect)
+		{
+			if (SetWindowPos(
+				window,
+				HWND_TOP,	// 手前に表示
+				(int)rect.X, (int)rect.Y,
+				(int)rect.Width, (int)rect.Height,
+				SetWindowPosFlags.SHOWWINDOW) == false)
 			{
-				return Rect.Empty;
+				// エラーを例外に変換
+				Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+			}
+		}
+		#endregion
+
+		#region GetDesktopRectangle
+		private const uint SPI_GETWORKAREA = 0x0030;
+
+		/// <summary>
+		/// SystemParametersInfo API（但しRECT構造体のみ対応）を示す定義です。
+		/// </summary>
+		/// <param name="uiAction">種類</param>
+		/// <param name="uiParam">パラメータ（未使用）</param>
+		/// <param name="pvParam">RECT構造体</param>
+		/// <param name="fWinIni">取得操作フラグ（未使用）</param>
+		/// <returns></returns>
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern bool SystemParametersInfo(
+			uint uiAction, uint uiParam, ref RECT pvParam, uint fWinIni);
+
+		/// <summary>
+		/// デスクトップ領域の矩形を取得します。
+		/// </summary>
+		/// <returns>デスクトップの矩形</returns>
+		public static Rect GetDesktopRectangle()
+		{
+			// TODO: この情報は、マルチモニターに対応していません。
+
+			var rect = new RECT();
+			if (SystemParametersInfo(SPI_GETWORKAREA, 0, ref rect, 0) == false)
+			{
+				// エラーを例外に変換
+				Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
 			}
 
-			// サイズを計算して返す
-			return new Rect(rect.Left, rect.Top, rect.Right - rect.Left + 1, rect.Bottom - rect.Top + 1);
+			return rect.ToRect();
 		}
+		#endregion
 	}
 }

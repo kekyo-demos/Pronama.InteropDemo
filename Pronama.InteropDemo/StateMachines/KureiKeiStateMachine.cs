@@ -1,5 +1,4 @@
-﻿<!--
-////////////////////////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Pronama.InteropDemo - How to use Win32 API in .NET 
 // Copyright (c) Kouji Matsui, All rights reserved.
@@ -25,40 +24,35 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
--->
-<Window
-	x:Class="Pronama.InteropDemo.KureiKeiWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:Pronama.InteropDemo"
-    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-    xmlns:ui="clr-namespace:Pronama.InteropDemo.UI"
-    mc:Ignorable="d"
-	AllowsTransparency="True"
-	Background="Transparent"
-	WindowStyle="None"
-	Topmost="True"
-	WindowStartupLocation="Manual"
-	ResizeMode="NoResize"
-	SizeToContent="Manual"
-    Title="Pronama.InteropDemo"
-	Width="64"
-	Height="128">
-	<i:Interaction.Behaviors>
-		<ui:BoundBehavior Bound="{Binding CurrentBound.Value}" />
-	</i:Interaction.Behaviors>
-	<i:Interaction.Triggers>
-		<i:EventTrigger EventName="Loaded">
-			<i:InvokeCommandAction Command="{Binding Loaded}" />
-		</i:EventTrigger>
-		<i:EventTrigger EventName="Closed">
-			<i:InvokeCommandAction Command="{Binding Closed}" />
-		</i:EventTrigger>
-	</i:Interaction.Triggers>
-	<Window.DataContext>
-		<local:KureiKeiViewModel />
-	</Window.DataContext>
-	<Image Source="{Binding CurrentImage.Value}" RenderOptions.BitmapScalingMode="NearestNeighbor" />
-</Window>
+
+using System.Windows;
+using System.Windows.Media;
+
+namespace Pronama.InteropDemo.StateMachines
+{
+	/// <summary>
+	/// ステートマシンの基底クラスです。
+	/// </summary>
+	public abstract class KureiKeiStateMachine
+	{
+		protected KureiKeiStateMachine()
+		{
+		}
+
+		/// <summary>
+		/// 現在の位置を取得します。
+		/// </summary>
+		public Point CurrentPoint { get; protected set; }
+
+		/// <summary>
+		/// 現在のイメージを取得します。
+		/// </summary>
+		public ImageSource CurrentImage { get; protected set; }
+
+		/// <summary>
+		/// 次のステートを計算し、ステートマシンを取得します。
+		/// </summary>
+		/// <returns>次のステートマシン</returns>
+		public abstract KureiKeiStateMachine Next();
+	}
+}

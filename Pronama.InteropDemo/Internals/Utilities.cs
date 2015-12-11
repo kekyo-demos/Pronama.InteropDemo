@@ -29,11 +29,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
-namespace Pronama.InteropDemo
+namespace Pronama.InteropDemo.Internals
 {
 	public static class Utilities
 	{
+		/// <summary>
+		/// PointをVectorに変換します。
+		/// </summary>
+		/// <param name="point">Point</param>
+		/// <returns>Vector</returns>
+		/// <remarks>ベクトル演算に使用します。</remarks>
+		public static Vector ToVector(this Point point)
+		{
+			return new Vector(point.X, point.Y);
+		}
+
+		/// <summary>
+		/// VectorをPointに変換します。
+		/// </summary>
+		/// <param name="vector">Vector</param>
+		/// <returns>Point</returns>
+		/// <remarks>ベクトル演算に使用します。</remarks>
+		public static Point ToPoint(this Vector vector)
+		{
+			return new Point(vector.X, vector.Y);
+		}
+
 		/// <summary>
 		/// 二つのベクトルの外積を求めます。
 		/// </summary>
@@ -68,7 +92,7 @@ namespace Pronama.InteropDemo
 		/// <param name="b1">線分bの始点</param>
 		/// <param name="b2">線分bの終点</param>
 		/// <returns>見つかった場合は交点</returns>
-		public static Nullable<Vector> Intersect(Vector a1, Vector a2, Vector b1, Vector b2)
+		public static Vector? Intersect(Vector a1, Vector a2, Vector b1, Vector b2)
 		{
 			if (!IsIntersect(a1, a2, b1, b2))
 			{
@@ -89,7 +113,7 @@ namespace Pronama.InteropDemo
 			return NativeMethods.EnumerateWindowHandles().
 				Where(NativeMethods.IsValidWindow).
 				Select(NativeMethods.GetWindowRectangle).
-				Where(rect => !rect.IsEmpty && (rect.Size.Width >= 1) && (rect.Size.Height >= 1)).
+				Where(rect => !rect.IsEmpty && (rect.Width >= 1) && (rect.Height >= 1)).
 				ToList();
 		}
 
@@ -102,19 +126,34 @@ namespace Pronama.InteropDemo
 		/// <returns>着地地点情報</returns>
 		public static LandingInformation ComputeLanding(IEnumerable<Rect> boxes, Point currentPoint, Point nextPoint)
 		{
-			
+			var a1 = currentPoint.ToVector();
+			var a2 = nextPoint.ToVector();
+
+			return boxes.
+				OrderBy(box => box.Y).
+				Select(box => new {box, p = Intersect(a1, a2, box.TopLeft.ToVector(), box.TopRight.ToVector())}).
+				Where(result => result.p.HasValue).
+				Select(result => new LandingInformation(result.box, result.p.Value.ToPoint())).
+				FirstOrDefault();
 		}
-	}
 
-	public sealed class LandingInformation
-	{
-		public readonly Rect BoxRect;
-		public readonly Point LandingPoint;
-
-		public LandingInformation(Rect boxRect, Point landingPoint)
+		/// <summary>
+		/// 指定されたURIのイメージをロードします。
+		/// </summary>
+		/// <param name="uri">URI</param>
+		/// <returns>ImageSource</returns>
+		public static ImageSource LoadImage(string uri)
 		{
-			this.BoxRect = boxRect;
-			this.LandingPoint = landingPoint;
+			// Freezeすると、パフォーマンスが向上します。
+			// （但し変更を加えることが出来なくなる。イメージ的には無問題）
+			// しかし、Freezeするには、イメージのロードが同期的に完了していなければならないので、
+			// BeginInitとEndInitで挟まれた内部でUriSourceを設定することでロードを実行している。
+			var bitmapImage = new BitmapImage();
+			bitmapImage.BeginInit();
+			bitmapImage.UriSource = new Uri(uri, UriKind.RelativeOrAbsolute);
+			bitmapImage.EndInit();
+			bitmapImage.Freeze();
+			return bitmapImage;
 		}
 	}
 }

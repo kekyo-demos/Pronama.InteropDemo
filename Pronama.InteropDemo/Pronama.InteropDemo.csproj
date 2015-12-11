@@ -50,16 +50,22 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Command.cs" />
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="Property.cs" />
-    <Compile Include="Utilities.cs" />
+    <Compile Include="Internals\LandingInformation.cs" />
+    <Compile Include="UI\Command.cs" />
+    <Compile Include="StateMachines\KureiKeiWalkingStateMachine.cs" />
+    <Compile Include="StateMachines\KureiKeiFallStateMachine.cs" />
+    <Compile Include="StateMachines\KureiKeiStateMachine.cs" />
+    <Compile Include="Internals\NativeMethods.cs" />
+    <Compile Include="UI\Property.cs" />
+    <Compile Include="UI\BoundBehavior.cs" />
+    <Compile Include="Internals\Utilities.cs" />
     <Page Include="KureiKeiWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
