@@ -11,7 +11,7 @@
 ## How to use
 * Currently, no binary installer.
 * Build on Visual Studio 2015 with "Visual Studio 2015 installer projects extension" https://visualstudiogallery.msdn.microsoft.com/f1cc3f3e-c300-40a7-8797-c509fb8933b9 
-* Simple run excutable.
+* Simple run excutable. Indicate system tray icon, you can show sites, or exit application.
 
 ## TODO:
 * Add binary installer.
