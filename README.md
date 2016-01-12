@@ -15,8 +15,9 @@
 
 ## TODO:
 * Add binary installer.
-* Add systray management.
+* Add auto-run feature.
 * Fix non-interactive recalculation via window locations.
 
 ## History
 * 1.0.0.0: Initial published.
+* 1.0.1.0: Add system tray management.
