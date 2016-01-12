@@ -8,9 +8,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E8F0EF6A-EC62-4562-9C86-1EA58D257B30}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		CuteRun.PronamaChan.ico = CuteRun.PronamaChan.ico
 		Pronama.InteropDemo.gif = Pronama.InteropDemo.gif
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CuteRun.PronamaChan", "CuteRun.PronamaChan\CuteRun.PronamaChan.vdproj", "{2E213471-0DB8-45FC-B319-A39F47D603D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,6 +25,8 @@ Global
 		{AEA9745A-1E17-492C-B551-B5AE558BF575}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEA9745A-1E17-492C-B551-B5AE558BF575}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEA9745A-1E17-492C-B551-B5AE558BF575}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E213471-0DB8-45FC-B319-A39F47D603D9}.Debug|Any CPU.ActiveCfg = Debug
+		{2E213471-0DB8-45FC-B319-A39F47D603D9}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,14 +3,13 @@
 ## What is this?
 * Running "Kurei Kei" (pronounce "Pronama-chan") on Windows desktop application.
 * Published on "Programing-Namahousou benkyoukai @ 2015 Nagoya"
-* Report in blog here (posted japanese only)
-  * http://www.kekyo.net/2015/12/12/5418
+* Report in blog here (posted japanese only) http://www.kekyo.net/2015/12/12/5418
 
 ![Kurei Kei / Pronama-chan](https://raw.githubusercontent.com/kekyo/Pronama.InteropDemo/master/Pronama.InteropDemo.gif)
 
 ## How to use
 * Currently, no binary installer.
-* Build on Visual Studio 2015.
+* Build on Visual Studio 2015 with "Visual Studio 2015 installer projects extension" https://visualstudiogallery.msdn.microsoft.com/f1cc3f3e-c300-40a7-8797-c509fb8933b9 
 * Simple run excutable.
 
 ## TODO:
