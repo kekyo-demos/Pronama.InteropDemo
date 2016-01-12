@@ -158,6 +158,7 @@ namespace Pronama.InteropDemo.Internals
 		/// <summary>
 		/// SetWindowPos Flags
 		/// </summary>
+		[Flags]
 		private enum SetWindowPosFlags
 		{
 			NOSIZE = 0x0001,
@@ -206,7 +207,7 @@ namespace Pronama.InteropDemo.Internals
 				HWND_TOP,	// 手前に表示
 				(int)rect.X, (int)rect.Y,
 				(int)rect.Width, (int)rect.Height,
-				SetWindowPosFlags.SHOWWINDOW) == false)
+				SetWindowPosFlags.NOZORDER | SetWindowPosFlags.NOSIZE | SetWindowPosFlags.NOACTIVATE) == false)
 			{
 				// エラーを例外に変換
 				Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());

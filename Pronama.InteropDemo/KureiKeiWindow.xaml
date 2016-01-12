@@ -43,7 +43,8 @@
 	WindowStartupLocation="Manual"
 	ResizeMode="NoResize"
 	SizeToContent="Manual"
-    Title="Pronama.InteropDemo"
+	ShowInTaskbar="False"
+    Title="CuteRun.PronamaChan!"
 	Width="64"
 	Height="128">
 	<i:Interaction.Behaviors>

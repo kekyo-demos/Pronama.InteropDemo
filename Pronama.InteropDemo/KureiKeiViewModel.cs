@@ -29,7 +29,6 @@ using System;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Pronama.InteropDemo.Internals;
 using Pronama.InteropDemo.StateMachines;
 using Pronama.InteropDemo.UI;
 

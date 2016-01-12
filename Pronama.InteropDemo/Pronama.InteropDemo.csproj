@@ -40,6 +40,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -55,11 +57,8 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
     <Compile Include="Internals\LandingInformation.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="UI\Command.cs" />
     <Compile Include="StateMachines\KureiKeiWalkingStateMachine.cs" />
     <Compile Include="StateMachines\KureiKeiFallStateMachine.cs" />
@@ -72,10 +71,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="KureiKeiViewModel.cs" />
     <Compile Include="KureiKeiWindow.xaml.cs">
       <DependentUpon>KureiKeiWindow.xaml</DependentUpon>
