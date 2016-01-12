@@ -1,4 +1,4 @@
-# Pronama.InteropDemo
+# CuteRun.PronamaChan!
 ![Kurei Kei lie-down](https://raw.githubusercontent.com/kekyo/Pronama.InteropDemo/master/sd20_lie-down.png)
 
 ## What is this?
