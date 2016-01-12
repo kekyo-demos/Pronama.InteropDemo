@@ -1,4 +1,5 @@
 # Pronama.InteropDemo
+![Kurei Kei lie-down](https://raw.githubusercontent.com/kekyo/Pronama.InteropDemo/master/sd20_lie-down.png)
 
 ## What is this?
 * Running "Kurei Kei" (pronounce "Pronama-chan") on Windows desktop application.
